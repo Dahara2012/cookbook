@@ -1,0 +1,46 @@
+---
+version: "3.4"
+networks:
+  proxynetwork:
+    external: true
+  default:
+services:
+  paperless-broker:
+    container_name: paperless-broker
+    image: redis:6.0
+    restart: unless-stopped
+    volumes:
+      - ./redis-data:/data
+    networks:
+      default:
+  paperless-ngx:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless-ngx
+    restart: unless-stopped
+    depends_on:
+      - paperless-broker
+    #ports:
+    #  - 8000:8000
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./paperless-data:/usr/src/paperless/data
+      - ./paperless-media:/usr/src/paperless/media
+      - ./paperless-export:/usr/src/paperless/export
+      - /mnt/turbonas/consume:/usr/src/paperless/consume
+    environment:
+      - PAPERLESS_REDIS=redis://paperless-broker:6379
+      - USERMAP_UID=1000
+      - USERMAP_GID=1000
+      - PAPERLESS_OCR_LANGUAGE=deu
+      - PAPERLESS_URL=https://dms.dahara.de
+      - PAPERLESS_TIME_ZONE=Europe/Berlin
+      - PAPERLESS_CONSUMER_POLLING=30000
+    networks:
+      default:
+      proxynetwork:
+    depends_on:
+      - paperless-broker
