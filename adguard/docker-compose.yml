@@ -7,6 +7,7 @@ services:
     volumes:
       - ./work:/opt/adguardhome/work
       - ./conf:/opt/adguardhome/conf
+      - /etc/timezone:/etc/timezone
     # Uncomment when you want to setup a DHCP server as well
     #network_mode: "host"
     ports:
