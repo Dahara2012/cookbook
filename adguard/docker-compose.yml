@@ -1,0 +1,35 @@
+version: '2.1'
+services:
+  dns:
+    container_name: dns
+    image: adguard/adguardhome:latest
+    restart: unless-stopped
+    volumes:
+      - ./work:/opt/adguardhome/work
+      - ./conf:/opt/adguardhome/conf
+    # Uncomment when you want to setup a DHCP server as well
+    #network_mode: "host"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "68:68/tcp"
+      - "68:68/udp"
+      #- "8086:80/tcp"
+      - "853:853/tcp"
+    networks:
+      proxynetwork:
+      maclan:
+        ipv4_address: 192.168.x.x
+networks:
+  proxynetwork:
+    external: true
+  maclan:
+    driver: macvlan
+    driver_opts:
+      parent: enp2s0
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.x.0/24
+          gateway: 192.168.x.x
