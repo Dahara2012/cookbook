@@ -1,0 +1,13 @@
+version: '2.1'
+services:
+  kuma:
+    container_name: kuma
+    image: louislam/uptime-kuma:latest
+    restart: unless-stopped
+    volumes:
+      - ./uptime-kuma:/app/data
+    networks:
+      proxynetwork:
+networks:
+  proxynetwork:
+    external: true
